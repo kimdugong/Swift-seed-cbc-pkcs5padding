@@ -13,6 +13,8 @@
 		423E9F852484E39100E96C19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 423E9F842484E39100E96C19 /* Assets.xcassets */; };
 		423E9F882484E39100E96C19 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 423E9F872484E39100E96C19 /* Preview Assets.xcassets */; };
 		423E9F8B2484E39100E96C19 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 423E9F892484E39100E96C19 /* LaunchScreen.storyboard */; };
+		423E9F982484ED0400E96C19 /* seedcbc.c in Sources */ = {isa = PBXBuildFile; fileRef = 423E9F972484ED0400E96C19 /* seedcbc.c */; };
+		423E9F9A2485CFD500E96C19 /* CryptoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423E9F992485CFD500E96C19 /* CryptoManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,10 @@
 		423E9F872484E39100E96C19 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		423E9F8A2484E39100E96C19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		423E9F8C2484E39100E96C19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		423E9F922484E97400E96C19 /* CryptoExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CryptoExample-Bridging-Header.h"; sourceTree = "<group>"; };
+		423E9F962484EA2500E96C19 /* seedcbc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = seedcbc.h; sourceTree = "<group>"; };
+		423E9F972484ED0400E96C19 /* seedcbc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = seedcbc.c; sourceTree = "<group>"; };
+		423E9F992485CFD500E96C19 /* CryptoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +62,7 @@
 		423E9F7D2484E38F00E96C19 /* CryptoExample */ = {
 			isa = PBXGroup;
 			children = (
+				423E9F972484ED0400E96C19 /* seedcbc.c */,
 				423E9F7E2484E38F00E96C19 /* AppDelegate.swift */,
 				423E9F802484E38F00E96C19 /* SceneDelegate.swift */,
 				423E9F822484E38F00E96C19 /* ContentView.swift */,
@@ -63,6 +70,9 @@
 				423E9F892484E39100E96C19 /* LaunchScreen.storyboard */,
 				423E9F8C2484E39100E96C19 /* Info.plist */,
 				423E9F862484E39100E96C19 /* Preview Content */,
+				423E9F922484E97400E96C19 /* CryptoExample-Bridging-Header.h */,
+				423E9F962484EA2500E96C19 /* seedcbc.h */,
+				423E9F992485CFD500E96C19 /* CryptoManager.swift */,
 			);
 			path = CryptoExample;
 			sourceTree = "<group>";
@@ -107,6 +117,7 @@
 				TargetAttributes = {
 					423E9F7A2484E38F00E96C19 = {
 						CreatedOnToolsVersion = 11.5;
+						LastSwiftMigration = 1150;
 					};
 				};
 			};
@@ -146,7 +157,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				423E9F9A2485CFD500E96C19 /* CryptoManager.swift in Sources */,
 				423E9F7F2484E38F00E96C19 /* AppDelegate.swift in Sources */,
+				423E9F982484ED0400E96C19 /* seedcbc.c in Sources */,
 				423E9F812484E38F00E96C19 /* SceneDelegate.swift in Sources */,
 				423E9F832484E38F00E96C19 /* ContentView.swift in Sources */,
 			);
@@ -284,6 +297,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"CryptoExample/Preview Content\"";
 				DEVELOPMENT_TEAM = XNB68CC222;
@@ -295,6 +309,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.siparoma.CryptoExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CryptoExample/CryptoExample-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -304,6 +320,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"CryptoExample/Preview Content\"";
 				DEVELOPMENT_TEAM = XNB68CC222;
@@ -315,6 +332,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.siparoma.CryptoExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CryptoExample/CryptoExample-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
