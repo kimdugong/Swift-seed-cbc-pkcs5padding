@@ -15,6 +15,7 @@
 		423E9F8B2484E39100E96C19 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 423E9F892484E39100E96C19 /* LaunchScreen.storyboard */; };
 		423E9F982484ED0400E96C19 /* seedcbc.c in Sources */ = {isa = PBXBuildFile; fileRef = 423E9F972484ED0400E96C19 /* seedcbc.c */; };
 		423E9F9A2485CFD500E96C19 /* CryptoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423E9F992485CFD500E96C19 /* CryptoManager.swift */; };
+		42D0ABAA24878E4600D2AF85 /* KeyboardResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D0ABA924878E4600D2AF85 /* KeyboardResponder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		423E9F962484EA2500E96C19 /* seedcbc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = seedcbc.h; sourceTree = "<group>"; };
 		423E9F972484ED0400E96C19 /* seedcbc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = seedcbc.c; sourceTree = "<group>"; };
 		423E9F992485CFD500E96C19 /* CryptoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoManager.swift; sourceTree = "<group>"; };
+		42D0ABA924878E4600D2AF85 /* KeyboardResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 				423E9F922484E97400E96C19 /* CryptoExample-Bridging-Header.h */,
 				423E9F962484EA2500E96C19 /* seedcbc.h */,
 				423E9F992485CFD500E96C19 /* CryptoManager.swift */,
+				42D0ABA924878E4600D2AF85 /* KeyboardResponder.swift */,
 			);
 			path = CryptoExample;
 			sourceTree = "<group>";
@@ -162,6 +165,7 @@
 				423E9F982484ED0400E96C19 /* seedcbc.c in Sources */,
 				423E9F812484E38F00E96C19 /* SceneDelegate.swift in Sources */,
 				423E9F832484E38F00E96C19 /* ContentView.swift in Sources */,
+				42D0ABAA24878E4600D2AF85 /* KeyboardResponder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

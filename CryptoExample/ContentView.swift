@@ -9,95 +9,144 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var symentricKey: String = ""
-    @State private var base64iv: String = ""
 
-    @State private var message: String = "this is very secret!"
+    @ObservedObject var keyboard = KeyboardResponder()
 
-    @State private var encMessage: String = ""
-    @State private var decMessage: String = ""
+    // SEED-CBC
+    @State private var base64Key: String = ""
+    @State private var base64Iv: String = ""
 
-    private let key: [UInt8] = [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]
-    private let iv: [UInt8] = [0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
+    @State private var message1: String = "-SEED-CBC-MESSAGE-TEST"
+
+    @State private var encMessage1: String = ""
+    @State private var decMessage1: String = ""
+
+    @State private var key = "[B@2a5ca609"
+    @State private var iv = "INICISKPAYKEYIV."
+
+    // RSA
+    @State private var message2: String = "-RSA-MESSAGE-TEST-"
+
+    @State private var encMessage2: String = ""
+    @State private var decMessage2: String = ""
+
+    @State private var privateKey: SecKey?
+    @State private var publicKey: SecKey?
+    @State private var pubKey: String = ""
+    @State private var privKey: String = ""
 
     var body: some View {
         Form {
-            Section {
-                TextField("평문", text: $message)
-            }
-            Section (header: Text("seed-cbc 대칭키 암호화")){
-                Button(action: {
-                    self.symentricKey = Data(bytes: self.key, count: self.key.count).base64EncodedString()
-                }) {
-                    Text("1. 키인코딩 하기")
+            seedCbcSection()
+            rsaSection()
+        }
+        .padding(.bottom, keyboard.currentHeight)
+        .animation(.easeOut(duration: keyboard.duration))
+
+    }
+
+    private func seedCbcSection() -> some View {
+        Group {
+            Section (header: Text("seed-cbc 대칭키 암호화")) {
+                HStack {
+                    Text("Message").foregroundColor(.gray)
+                    TextField("평문", text: $message1)
                 }
-                TextField("1. 키인코딩 하기 결과", text: $symentricKey)
+                HStack {
+                    Text("SymentricKey").foregroundColor(.gray)
+                    TextField("대칭키", text: $key)
+                }
+                HStack {
+                    Text("InitializationVector").foregroundColor(.gray)
+                    TextField("초기화벡터", text: $iv)
+                }
+            }
+            Section {
                 Button(action: {
-                    self.base64iv = Data(bytes: self.iv, count: self.iv.count).base64EncodedString()
+                    self.base64Key = Data(bytes: self.key, count: self.key.count).base64EncodedString()
+                }) {
+                    Text("1. 키 인코딩 하기")
+                }
+                TextField("1. 키 인코딩 하기 결과", text: $base64Key)
+                Button(action: {
+                    self.base64Iv = Data(bytes: self.iv, count: self.iv.count).base64EncodedString()
                 }) {
                     Text("2. iv 인코딩하기")
                 }
-                TextField("2. iv 인코딩하기 결과", text: $base64iv)
+                TextField("2. iv 인코딩하기 결과", text: $base64Iv)
                 Button(action: {
-                    self.encMessage = seedEncryption(message: self.message, key: self.symentricKey, iv: self.base64iv)
+                    self.encMessage1 = seedEncryption(message: self.message1, key: self.base64Key, iv: self.base64Iv)
                 }) {
-                    Text("2. 대칭키로 암호화")
+                    Text("3. 대칭키로 암호화")
                 }
-                TextField("2. 대칭키로 암호화 결과", text: $encMessage)
+                TextField("3. 대칭키로 암호화 결과", text: $encMessage1)
                 Button(action: {
-                    self.decMessage = seedDecryption(message: self.encMessage, key: self.symentricKey, iv: self.base64iv)
+                    self.decMessage1 = seedDecryption(message: self.encMessage1, key: self.base64Key, iv: self.base64Iv)
                 }) {
-                    Text("3. 대칭키로 복호화")
+                    Text("4. 대칭키로 복호화")
                 }
-                TextField("3. 대칭키로 복호화 결과", text: $decMessage)
+                TextField("4. 대칭키로 복호화 결과", text: $decMessage1)
             }
-
-            Section {
-                Text("seed-cbc 대칭키 암호화")
-                Button(action: {
-                    print(self.symentricKey)
-                }) {
-                    Text("1. 키생성 하기")
-                }
-                TextField("1. 키생성 하기 결과", text: $symentricKey)
-            }
-
-
-            Section {
-                Text("seed-cbc 대칭키 암호화")
-                Button(action: {
-                    print(self.symentricKey)
-                }) {
-                    Text("1. 키생성 하기")
-                }
-                TextField("1. 키생성 하기 결과", text: $symentricKey)
-            }
-
-
-            Section {
-                Text("seed-cbc 대칭키 암호화")
-                Button(action: {
-                    print(self.symentricKey)
-                }) {
-                    Text("1. 키생성 하기")
-                }
-                TextField("1. 키생성 하기 결과", text: $symentricKey)
-            }
-
-
-            Section {
-                Text("seed-cbc 대칭키 암호화")
-                Button(action: {
-                    print(self.symentricKey)
-                }) {
-                    Text("1. 키생성 하기")
-                }
-                TextField("1. 키생성 하기 결과", text: $symentricKey)
-            }
-
-
         }
+    }
 
+    private func rsaSection() -> some View {
+        Group{
+            Section (header: Text("RSA 비대칭키 암호화")) {
+                HStack {
+                    Text("Message").foregroundColor(.gray)
+                    TextField("평문", text: $message2)
+                }
+                HStack {
+                    Text("PublicKey").foregroundColor(.gray)
+                    TextField("공개키", text: $pubKey).font(.system(size: 8))
+                }
+                HStack {
+                    Text("PrivateKey").foregroundColor(.gray)
+                    TextField("비공개키", text: $privKey).font(.system(size: 8))
+                }
+            }
+            Section {
+                Button(action: {
+                    let result = createPK()
+                    switch result {
+                    case .success(let result):
+                        guard let privKey = result["privateKey"], let pubKey = result["publicKey"],let pubStringKey = result["pubStringKey"] as? String, let privStringKey = result["privStringKey"] as? String else {
+                            fatalError()
+                        }
+                        self.privateKey = (privKey as! SecKey)
+                        self.publicKey = (pubKey as! SecKey)
+                        self.pubKey = pubStringKey
+                        self.privKey = privStringKey
+
+                    case .failure(let error):
+                        print(error)
+                        break
+                    }
+                }) {
+                    Text("1. 비대칭키 생성")
+                }
+                TextField("1. 공개키 결과", text: $pubKey)
+                Button(action: {
+                    guard let publicKey = self.publicKey else {
+                        fatalError("공개키 없음")
+                    }
+                    self.encMessage2 = rsaEncryption(message: self.message2, publicKey: publicKey)
+                }) {
+                    Text("2. 공개키 암호화")
+                }
+                TextField("2. 암호화 결과", text: $encMessage2)
+                Button(action: {
+                    guard let privateKey = self.privateKey else {
+                        fatalError("공개키 없음")
+                    }
+                    self.decMessage2 = rsaDecryption(message: self.encMessage2, privateKey: privateKey)
+                }) {
+                    Text("3. 개인키 복호화")
+                }
+                TextField("3. 복호화 결과", text: $decMessage2)
+            }
+        }
     }
 }
 

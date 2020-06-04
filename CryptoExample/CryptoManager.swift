@@ -12,27 +12,19 @@ func seedEncryption(message: String, key: String?, iv: String?) -> String {
     guard let input = message.data(using: .utf8), let key = key?.data(using: .utf8), let iv = iv?.data(using: .utf8) else {
         fatalError("암호화 데이타가 적절하지 않음")
     }
-
     var inputBytes = [UInt8](input)
-    let inputUint8Pointer = UnsafeMutablePointer<UInt8>.allocate(capacity: inputBytes.count)
-    inputUint8Pointer.initialize(from: &inputBytes, count: inputBytes.count)
-
     var keyBytes = [UInt8](key)
-    let keyUint8Pointer = UnsafeMutablePointer<UInt8>.allocate(capacity: keyBytes.count)
-    keyUint8Pointer.initialize(from: &keyBytes, count: keyBytes.count)
-
     var ivBytes = [UInt8](iv)
-    let ivUint8Pointer = UnsafeMutablePointer<UInt8>.allocate(capacity: ivBytes.count)
-    ivUint8Pointer.initialize(from: &ivBytes, count: ivBytes.count)
 
-    var outBytes = [UInt8](repeating: 0, count: Int(SEED_BLOCK_SIZE) + 1)
+    var outBytes = [UInt8](repeating: 0, count: inputBytes.count + Int(SEED_BLOCK_SIZE))
 
-    let result = KISA_SEED_CBC_ENCRYPT(keyUint8Pointer, ivUint8Pointer, inputUint8Pointer, UInt32(inputBytes.count), &outBytes)
+    let outlen = KISA_SEED_CBC_ENCRYPT(&keyBytes, &ivBytes, &inputBytes, UInt32(inputBytes.count), &outBytes)
 
-    if result == 0 {
+    if outlen == 0 {
         fatalError("암호화 실패")
     }
-    return Data(bytes: outBytes, count: Int(result)).base64EncodedString()
+
+    return Data(bytes: outBytes, count: Int(outlen)).base64EncodedString()
 }
 
 func seedDecryption(message: String, key: String?, iv: String?) -> String {
@@ -41,27 +33,98 @@ func seedDecryption(message: String, key: String?, iv: String?) -> String {
     }
 
     var inputBytes = [UInt8](inputData)
-    let inputUint8Pointer = UnsafeMutablePointer<UInt8>.allocate(capacity: inputBytes.count)
-    inputUint8Pointer.initialize(from: &inputBytes, count: inputBytes.count)
-
     var keyBytes = [UInt8](key)
-    let keyUint8Pointer = UnsafeMutablePointer<UInt8>.allocate(capacity: keyBytes.count)
-    keyUint8Pointer.initialize(from: &keyBytes, count: keyBytes.count)
-
     var ivBytes = [UInt8](iv)
-    let ivUint8Pointer = UnsafeMutablePointer<UInt8>.allocate(capacity: ivBytes.count)
-    ivUint8Pointer.initialize(from: &ivBytes, count: ivBytes.count)
 
-    var outBytes = [UInt8](repeating: 0, count: Int(SEED_BLOCK_SIZE) + 1)
+    var outBytes = [UInt8](repeating: 0, count: input.count + Int(SEED_BLOCK_SIZE))
 
-    let result = KISA_SEED_CBC_DECRYPT(keyUint8Pointer, ivUint8Pointer, inputUint8Pointer, UInt32(inputBytes.count), &outBytes)
+    let outlen = KISA_SEED_CBC_DECRYPT(&keyBytes, &ivBytes, &inputBytes, UInt32(inputBytes.count), &outBytes)
 
-    if result == 0 {
+    if outlen == 0 {
         fatalError("복호화 실패")
     }
 
-    guard let digest =  String(data: Data(bytes: outBytes, count: Int(result)), encoding: .utf8) else {
+    guard let decMessage =  String(data: Data(bytes: outBytes, count: Int(outlen)), encoding: .utf8) else {
         fatalError("인코딩 에러")
     }
-    return digest
+    print(decMessage)
+    return decMessage
+}
+
+func getHexaString(bytes: [UInt8]) -> String {
+    return bytes.map({ String(format: "%02X", $0)}).joined()
+}
+
+func createPK() -> Result<[AnyHashable: Any], CFError>{
+    var error: Unmanaged<CFError>?
+
+    let attributes: [String: Any] = [
+        kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
+        kSecAttrKeySizeInBits as String: 1024
+    ]
+
+    let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, &error)
+    if error != nil {
+        return .failure(error as! CFError)
+    }
+
+    let publicKey = SecKeyCopyPublicKey(privateKey!)
+
+    let pubStringKey = SecKeyCopyExternalRepresentation(publicKey!, &error)
+    if error != nil {
+        return .failure(error as! CFError)
+    }
+
+    let privStringKey = SecKeyCopyExternalRepresentation(privateKey!, &error)
+    if error != nil {
+        return .failure(error as! CFError)
+    }
+
+    let result = [
+        "privateKey": privateKey!,
+        "publicKey": publicKey!,
+        "pubStringKey": (pubStringKey! as Data).base64EncodedString(),
+        "privStringKey": (privStringKey! as Data).base64EncodedString()
+        ] as [AnyHashable: Any]
+
+    print(result)
+    return .success(result)
+}
+
+
+func rsaEncryption(message: String, publicKey: SecKey) -> String {
+    let blockSize = SecKeyGetBlockSize(publicKey)
+    var messageEncrypted = [UInt8](repeating: 0, count: blockSize)
+    var messageEncryptedSize = blockSize
+    let result = SecKeyEncrypt(publicKey, .PKCS1, message, message.count, &messageEncrypted, &messageEncryptedSize)
+    if result != noErr {
+        fatalError("암호화 실패")
+    }
+    return Data(bytes: messageEncrypted, count: messageEncryptedSize).base64EncodedString()
+}
+
+func rsaDecryption(message: String, privateKey: SecKey) -> String {
+    guard let publicKey = SecKeyCopyPublicKey(privateKey) else {
+        fatalError("publickey 추론 실패")
+    }
+
+    guard let input = message.data(using: .utf8), let inputData = Data(base64Encoded: input, options: .ignoreUnknownCharacters) else {
+        fatalError("복호화 데이타가 적절하지 않음")
+    }
+
+    var inputBytes = [UInt8](inputData)
+    let blockSize = SecKeyGetBlockSize(publicKey)
+    var messageDecrypted = [UInt8](repeating: 0, count: blockSize)
+    var messageDecryptedSize = blockSize
+    let result = SecKeyDecrypt(privateKey, .PKCS1, &inputBytes, inputBytes.count, &messageDecrypted, &messageDecryptedSize)
+
+    if result != noErr {
+        fatalError("암호화 실패")
+    }
+
+    guard let decMessage =  String(data: Data(bytes: messageDecrypted, count: messageDecryptedSize), encoding: .utf8) else {
+        fatalError("인코딩 에러")
+    }
+    print(decMessage)
+    return decMessage
 }
