@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct ContentView: View {
-
     @ObservedObject var keyboard = KeyboardResponder()
 
     // SEED-CBC

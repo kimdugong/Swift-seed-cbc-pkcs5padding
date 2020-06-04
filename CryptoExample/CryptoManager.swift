@@ -80,6 +80,18 @@ func createPK() -> Result<[AnyHashable: Any], CFError>{
         return .failure(error as! CFError)
     }
 
+    print("------public key info------")
+    print(publicKey!)
+    print(pubStringKey!)
+    print((pubStringKey! as Data).base64EncodedString())
+    print("------public key info------")
+
+    print("------private key info------")
+    print(privateKey!)
+    print(privStringKey!)
+    print((privStringKey! as Data).base64EncodedString())
+    print("------private key info------")
+
     let result = [
         "privateKey": privateKey!,
         "publicKey": publicKey!,
@@ -87,7 +99,6 @@ func createPK() -> Result<[AnyHashable: Any], CFError>{
         "privStringKey": (privStringKey! as Data).base64EncodedString()
         ] as [AnyHashable: Any]
 
-    print(result)
     return .success(result)
 }
 
@@ -98,6 +109,7 @@ func rsaEncryption(message: String, publicKey: SecKey) -> String {
     var messageEncryptedSize = blockSize
     let result = SecKeyEncrypt(publicKey, .PKCS1, message, message.count, &messageEncrypted, &messageEncryptedSize)
     if result != noErr {
+        print(result)
         fatalError("암호화 실패")
     }
     return Data(bytes: messageEncrypted, count: messageEncryptedSize).base64EncodedString()
