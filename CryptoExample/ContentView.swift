@@ -41,7 +41,6 @@ struct ContentView: View {
         }
         .padding(.bottom, keyboard.currentHeight)
         .animation(.easeOut(duration: keyboard.duration))
-
     }
 
     private func seedCbcSection() -> some View {
@@ -74,13 +73,13 @@ struct ContentView: View {
                 }
                 TextField("2. iv 인코딩하기 결과", text: $base64Iv)
                 Button(action: {
-                    self.encMessage1 = seedEncryption(message: self.message1, key: self.base64Key, iv: self.base64Iv)
+                    self.encMessage1 = CryptoManager.seedEncryption(message: self.message1, key: self.base64Key, iv: self.base64Iv)
                 }) {
                     Text("3. 대칭키로 암호화")
                 }
                 TextField("3. 대칭키로 암호화 결과", text: $encMessage1)
                 Button(action: {
-                    self.decMessage1 = seedDecryption(message: self.encMessage1, key: self.base64Key, iv: self.base64Iv)
+                    self.decMessage1 = CryptoManager.seedDecryption(message: self.encMessage1, key: self.base64Key, iv: self.base64Iv)
                 }) {
                     Text("4. 대칭키로 복호화")
                 }
@@ -107,7 +106,7 @@ struct ContentView: View {
             }
             Section {
                 Button(action: {
-                    let result = createPK()
+                    let result = CryptoManager.createPK()
                     switch result {
                     case .success(let result):
                         guard let privKey = result["privateKey"], let pubKey = result["publicKey"],let pubStringKey = result["pubStringKey"] as? String, let privStringKey = result["privStringKey"] as? String else {
@@ -130,7 +129,7 @@ struct ContentView: View {
                     guard let publicKey = self.publicKey else {
                         fatalError("공개키 없음")
                     }
-                    self.encMessage2 = rsaEncryption(message: self.message2, publicKey: publicKey)
+                    self.encMessage2 = CryptoManager.rsaEncryption(message: self.message2, publicKey: publicKey)
                 }) {
                     Text("2. 공개키 암호화")
                 }
@@ -139,7 +138,7 @@ struct ContentView: View {
                     guard let privateKey = self.privateKey else {
                         fatalError("공개키 없음")
                     }
-                    self.decMessage2 = rsaDecryption(message: self.encMessage2, privateKey: privateKey)
+                    self.decMessage2 = CryptoManager.rsaDecryption(message: self.encMessage2, privateKey: privateKey)
                 }) {
                     Text("3. 개인키 복호화")
                 }
